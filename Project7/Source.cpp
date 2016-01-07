@@ -16,29 +16,23 @@
 #include<iostream>
 using namespace std;
 
-int dlugosc = 1200, szerokosc = 600;
+int dlugosc = 800, szerokosc = 600;
 
 
 int main() {
 	ALLEGRO_DISPLAY *display;
-	//LEGRO_SAMPLE *MUZ = NULL;
 	const float FPS = 60.0;
 	const float frameFPS = 15.0;
 	if (!al_init()) return -1;
 	display = al_create_display(dlugosc, szerokosc);
 	if (!display) return -1;
-	al_set_window_position(display, 400, 400);
+	al_set_window_position(display, 200, 200);
 	if (!al_install_audio())
 	{
 		fprintf(stderr, "blad!\n");
 		return -1;
 	}
 	if (!al_init_acodec_addon())
-	{
-		fprintf(stderr, "blad!\n");
-		return -1;
-	}
-	if (!al_reserve_samples(1))
 	{
 		fprintf(stderr, "blad!\n");
 		return -1;
@@ -51,19 +45,10 @@ int main() {
 	al_init_image_addon();
 	al_init_font_addon();
 	al_init_ttf_addon();
-
-
-	//Z = al_load_sample("coin1.wav");
-	/*(!MUZ)
-	{
-	printf("Audio clip nie laduje sie\n");
-	return -1;
-	}*/
 	ALLEGRO_BITMAP *glowa = al_load_bitmap("glowa.png");
 	ALLEGRO_BITMAP *cialo = al_load_bitmap("cialo.png");
 	ALLEGRO_FONT *font1 = al_load_font("Minecrafter_3.ttf", 15, 0);
 	ALLEGRO_FONT *mcfont = al_load_font("Minecrafter_3.ttf", 30, 0);
-	ALLEGRO_FONT *mcfont_1 = al_load_font("Minecrafter_3.ttf", 20, 0);
 	ALLEGRO_BITMAP *coin1 = al_load_bitmap("coin.png");
 	ALLEGRO_TIMER *timer = al_create_timer(1.0 / 10);
 	ALLEGRO_TIMER *frameTimer = al_create_timer(1.0 / frameFPS);
@@ -105,7 +90,7 @@ int main() {
 	int snakeRevolutionX[50], snakeRevolutionY[50];
 	bool menu = true;
 	bool dead = false;
-	while (1)
+	while (!done)
 	{
 		lastX = x;
 		lastY = y;
@@ -124,13 +109,45 @@ int main() {
 			}
 		}
 
-
+		else if (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
+			done = true;
 		if (event.type == ALLEGRO_EVENT_TIMER){
 			if (event.timer.source == VREME) timeS++;
 			if (event.timer.source == timer){
 				al_get_keyboard_state(&keyState);
-
-
+				if (al_key_down(&keyState, ALLEGRO_KEY_RIGHT) && dir != LEFT)
+					dir = RIGHT;
+				else if (al_key_down(&keyState, ALLEGRO_KEY_LEFT) && dir != RIGHT)
+					dir = LEFT;
+				else if (al_key_down(&keyState, ALLEGRO_KEY_UP) && dir != UP)
+					dir = UP;
+				else if (al_key_down(&keyState, ALLEGRO_KEY_DOWN) && dir != DOWN)
+					dir = DOWN;
+				else if (al_key_down(&keyState, ALLEGRO_KEY_A))
+					score++;
+				else if (al_key_down(&keyState, ALLEGRO_KEY_ENTER) && menu == true)
+					menu = false, score = 1, timeS = 0, x = 0, y = 0;
+				if (menu == false)
+				{
+					if (score != 0){
+						for (int i = score; i > 0; i--){
+							snakeRevolutionX[i] = snakeRevolutionX[i - 1];
+							snakeRevolutionY[i] = snakeRevolutionY[i - 1];
+						}
+						snakeRevolutionX[0] = lastX;
+						snakeRevolutionY[0] = lastY;
+					}
+				}
+				switch (dir){
+				case RIGHT: x = x + 40;
+					break;
+				case LEFT: x = x - 40;
+					break;
+				case UP: y = y - 40;
+					break;
+				case DOWN: y = y + 40;
+					break;
+				}
 				if (x == coinX && y == coinY)
 				{
 					score++;
@@ -147,7 +164,17 @@ int main() {
 				curF = 0;
 			frameC = 0;
 		}
+		if (dead && menu == false){
+			menu = true;
 
+			x = 0, y = 0;
+			for (int i = 0; i <= 50; i++)
+			{
+				snakeRevolutionX[i] = 0;
+			}
+			dead = false;
+			dir = DOWN;
+		}
 		if (draw == true){
 			draw = false;
 			if (menu){
@@ -157,27 +184,25 @@ int main() {
 				}
 				al_draw_text(mcfont, al_map_rgb(100, 50, 250), 170, 100, 0, "Enter by zaczac gre");
 				al_draw_text(mcfont, al_map_rgb(100, 50, 250), 205, 200, 0, "Esc by skonczyc gre");
-				al_draw_text(mcfont, al_map_rgb(100, 50, 250), 300, 250, 0, "Instrukcje:");
-				al_draw_text(mcfont_1, al_map_rgb(255, 255, 255), 300, 300, 0, "Sterowanie za pomoca strzalek,gora, dol, lewo, prawo.");
-				al_draw_text(mcfont_1, al_map_rgb(255, 255, 255), 300, 330, 0, "Zakaz dotykania scian i ciala weza.");
-				al_draw_text(mcfont_1, al_map_rgb(255, 255, 255), 300, 360, 0, "Zbierz jak najwiecej zlota.");
-
-				al_draw_textf(mcfont, al_map_rgb(250, 0, 250), 120, 385, 0, "Zloto:");
-				al_draw_textf(mcfont, al_map_rgb(250, 0, 250), 470, 385, 0, "Czas: sec");
+				al_draw_textf(mcfont, al_map_rgb(250, 0, 250), 120, 350, 0, "Zloto: %i", score - 1);
+				al_draw_textf(mcfont, al_map_rgb(250, 0, 250), 470, 350, 0, "Czas: %i sec", timeF);
 			}
 			else{
 				al_draw_bitmap_region(coin1, curF * frameW, 0, frameW, frameH, coinX, coinY, 0);
+				for (int i = 0; i < score; i++)
+				{
+					al_draw_bitmap(cialo, snakeRevolutionX[i], snakeRevolutionY[i], NULL);
+				}
 
+				al_draw_bitmap(glowa, x, y, NULL);
 			}
 			al_flip_display();
 			al_clear_to_color(al_map_rgb(0, 0, 0));
 		}
 	}
-
 	al_destroy_display(display);
 	al_destroy_timer(timer);
 	al_destroy_event_queue(event_queue);
-
 	return 0;
 
 }
