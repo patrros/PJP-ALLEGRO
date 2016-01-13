@@ -155,14 +155,20 @@ int main() {
 					coinY = 40 * (rand() % 15);
 					snakeRevolution[score] = 5;
 				}
-
+				// sciana
+				if (menu == false){
+					for (int i = 0; i < score; i++){
+						if (x == snakeRevolutionX[i] && y == snakeRevolutionY[i] && menu == false) dead = true;
+					}
+					if (x < 0 || x >= 800 || y < 0 || y >= 600 && menu == false) dead = true;
+				}
 				draw = true;
 			}
 		}
 		if (++frameC >= frameD){
-			if (++curF >= maxF)
+				if (++curF >= maxF)
 				curF = 0;
-			frameC = 0;
+				frameC = 0;
 		}
 		if (dead && menu == false){
 			menu = true;
@@ -184,7 +190,7 @@ int main() {
 				}
 				al_draw_text(mcfont, al_map_rgb(100, 50, 250), 170, 100, 0, "Enter by zaczac gre");
 				al_draw_text(mcfont, al_map_rgb(100, 50, 250), 205, 200, 0, "Esc by skonczyc gre");
-				al_draw_textf(mcfont, al_map_rgb(250, 0, 250), 120, 350, 0, "Zloto: %i", score - 1);
+				al_draw_textf(mcfont, al_map_rgb(250, 0, 250), 120, 350, 0, "Zloto %i", score - 1);
 				al_draw_textf(mcfont, al_map_rgb(250, 0, 250), 470, 350, 0, "Czas: %i sec", timeF);
 			}
 			else{
@@ -197,6 +203,12 @@ int main() {
 				al_draw_bitmap(glowa, x, y, NULL);
 			}
 			al_flip_display();
+
+
+
+
+
+
 			al_clear_to_color(al_map_rgb(0, 0, 0));
 		}
 	}
