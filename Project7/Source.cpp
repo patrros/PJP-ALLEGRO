@@ -155,7 +155,6 @@ int main() {
 					coinY = 40 * (rand() % 15);
 					snakeRevolution[score] = 5;
 				}
-				// sciana
 				if (menu == false){
 					for (int i = 0; i < score; i++){
 						if (x == snakeRevolutionX[i] && y == snakeRevolutionY[i] && menu == false) dead = true;
@@ -172,7 +171,7 @@ int main() {
 		}
 		if (dead && menu == false){
 			menu = true;
-
+			timeF = timeS;
 			x = 0, y = 0;
 			for (int i = 0; i <= 50; i++)
 			{
@@ -201,6 +200,9 @@ int main() {
 				}
 
 				al_draw_bitmap(glowa, x, y, NULL);
+				al_draw_textf(font1, al_map_rgb(250, 0, 250), 5, 5, 0, "Zloto: %i", score - 1);
+				al_draw_textf(font1, al_map_rgb(250, 0, 250), 705, 5, 0, "Czas: %i", timeS);
+				
 			}
 			al_flip_display();
 
@@ -216,5 +218,4 @@ int main() {
 	al_destroy_timer(timer);
 	al_destroy_event_queue(event_queue);
 	return 0;
-
 }
